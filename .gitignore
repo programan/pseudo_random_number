@@ -1,0 +1,32 @@
+# IDE and editor specific files #
+#################################
+/nbproject
+
+#IntelliJ IDEA
+.idea/
+*.iml
+
+# Eclipse data
+.metadata/
+.settings/
+.project
+.buildpath
+
+
+TAGS
+
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
+*.bak
+*~
+\#*\#
