@@ -36,11 +36,61 @@ def test_linear_rnd1(max):
     return int(rnd_next)
 
 
-if __name__ == '__main__':
-    print('test')
+def test_linear_rnd2(max):
+    """
+    乱数生成
+    """
+    # gccと同じ組み合わせで生成
+    global rnd_next
+    rnd_next = rnd_next * 1103515245 + 12345
+    # VCとかと同じように32bitに収まるようにする
+    # value % 2^32 == value & 2^32-1
+    rnd_next &= 0xffffffff
 
+    # 下位3ビットのみを使ってみる
+    # 周期が8になる
+    # 8個の乱数を出力すると同じパターン戻る
+    return int(rnd_next & 0x7)
+
+
+def test_linear_rnd3(max):
+    """
+    乱数生成
+    """
+    # gccと同じ組み合わせで生成
+    global rnd_next
+    rnd_next = rnd_next * 1103515245 + 12345
+    # VCとかと同じように32bitに収まるようにする
+    # value % 2^32 == value & 2^32-1
+    rnd_next &= 0xffffffff
+
+    # 上位3ビットのみを使ってみる
+    # 周期が少くとも536870912になる(のかな)
+    # 536870912個の乱数を出力すると同じパターン戻る
+    return int(rnd_next >> 29 & 0x7)
+
+
+if __name__ == '__main__':
+
+    print('test---------')
     for i in range(20):
         ret = test_linear_rnd1(128)
+        # print("%0b" % (ret))
+        value = "%d" % (ret)
+        print(str(value))
+        print("%s" % (bin(ret)))
+
+    print('test---------')
+    for i in range(20):
+        ret = test_linear_rnd2(128)
+        # print("%0b" % (ret))
+        value = "%d" % (ret)
+        print(str(value))
+        print("%s" % (bin(ret)))
+
+    print('test---------')
+    for i in range(20):
+        ret = test_linear_rnd3(128)
         # print("%0b" % (ret))
         value = "%d" % (ret)
         print(str(value))
