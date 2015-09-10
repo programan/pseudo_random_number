@@ -142,12 +142,69 @@ def test_linear_rnd6(minimum, maximum):
     # 上位15ビットのみを使ってみる
     # 下位ビットを捨てるので周期が長くなるが、15ビットの値のみなので精度は落る
     # minimumからmaximum未満で乱数を生成
-    return int(rnd_next >> 16 & RAND_MAX) % ((maximum + 1) - minimum) + minimum
+    return int((rnd_next >> 16 & RAND_MAX) % ((maximum + 1) - minimum)) + minimum
+
+
+def test_linear_rnd_generator():
+    """
+    乱数生成
+    """
+
+    # gccと同じ組み合わせで生成
+    global rnd_next
+    # VCとかと同じように32bitに収まるようにする
+    # value % 2^32 == value & 2^32-1
+    rnd_next = (rnd_next * 1103515245 + 12345) & 0xffffffff
+
+    # VCっぽく
+    # 上位15ビットのみを使ってみる
+    # 下位ビットを捨てるので周期が長くなるが、15ビットの値のみなので精度は落る
+    return ((rnd_next >> 16) & RAND_MAX)
+
+
+def test_linear_rnd7(minimum, maximum):
+    """
+    乱数生成
+    0から引数の値未満の乱数を返す
+    引数が0なら2**32とする
+    """
+
+    if minimum < 0:
+        minimum = 0
+
+    if maximum <= 0:
+        maximum = 2 ** 32
+
+    if minimum > maximum:
+        tmp = minimum
+        minimum = maximum
+        maximum = tmp
+
+    # minimumからmaximum未満で乱数を生成
+    return int((test_linear_rnd_generator() % ((maximum + 1) - minimum)) + minimum)
+
+
+def test_linear_rnd8():
+    """
+    乱数生成
+    0.0から1.0未満の乱数を返す
+    pythonのコマンドラインで計算すると仮数部は16桁
+    Cで言うところのdoubleっぽい
+    でもプログラムで実行すると6桁
+    float
+    """
+
+    # 0.0から1.0未満で乱数を生成
+    # round()などで丸めこみはしない
+    return float((1.0 / (RAND_MAX + 1.0)) * test_linear_rnd_generator())
+    # return (1.0 / (RAND_MAX + 1.0)) * test_linear_rnd_generator()
 
 
 if __name__ == '__main__':
 
+    global rnd_next
     print('test---------')
+    rnd_next = 1
     for i in range(20):
         ret = test_linear_rnd1(128)
         # print("%0b" % (ret))
@@ -156,6 +213,7 @@ if __name__ == '__main__':
         print("%s" % (bin(ret)))
 
     print('test---------')
+    rnd_next = 1
     for i in range(20):
         ret = test_linear_rnd2(128)
         # print("%0b" % (ret))
@@ -164,6 +222,7 @@ if __name__ == '__main__':
         print("%s" % (bin(ret)))
 
     print('test---------')
+    rnd_next = 1
     for i in range(20):
         ret = test_linear_rnd3(128)
         # print("%0b" % (ret))
@@ -172,6 +231,7 @@ if __name__ == '__main__':
         print("%s" % (bin(ret)))
 
     print('test---------')
+    rnd_next = 1
     for i in range(20):
         ret = test_linear_rnd4(128)
         # print("%0b" % (ret))
@@ -180,6 +240,7 @@ if __name__ == '__main__':
         print("%s" % (bin(ret)))
 
     print('test---------')
+    rnd_next = 1
     for i in range(20):
         ret = test_linear_rnd5(128)
         # print("%0b" % (ret))
@@ -188,9 +249,28 @@ if __name__ == '__main__':
         print("%s" % (bin(ret)))
 
     print('test---------')
+    rnd_next = 1
     for i in range(20):
         ret = test_linear_rnd6(20, 128)
         # print("%0b" % (ret))
         value = "%d" % (ret)
         print(str(value))
         print("%s" % (bin(ret)))
+
+    print('test---------')
+    rnd_next = 1
+    for i in range(20):
+        ret = test_linear_rnd7(20, 128)
+        # print("%0b" % (ret))
+        value = "%d" % (ret)
+        print(str(value))
+        print("%s" % (bin(ret)))
+
+    print('test---------')
+    rnd_next = 1
+    for i in range(40):
+        ret = test_linear_rnd8()
+        # print("%0b" % (ret))
+        value = "%f" % (ret)
+        print(str(value))
+        # print("%s" % (bin(ret)))
