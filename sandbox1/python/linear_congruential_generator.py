@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+# from decimal import *
+
+
 # 線形合同法
 # X0 = seed
 # X(n+1) = (a * Xn + b) mod M
@@ -198,11 +201,13 @@ def test_linear_rnd8():
     # round()などで丸めこみはしない
     return float((1.0 / (RAND_MAX + 1.0)) * test_linear_rnd_generator())
     # return (1.0 / (RAND_MAX + 1.0)) * test_linear_rnd_generator()
+    # getcontext().prec = 16
+    # return Decimal((1.0 / (RAND_MAX + 1.0)) * test_linear_rnd_generator())
 
 
 if __name__ == '__main__':
 
-    global rnd_next
+    # global rnd_next
     print('test---------')
     rnd_next = 1
     for i in range(20):
