@@ -121,8 +121,16 @@ def test_linear_rnd6(minimum, maximum):
     引数が0なら2**32とする
     """
 
+    if minimum < 0:
+        minimum = 0
+
     if maximum <= 0:
         maximum = 2 ** 32
+
+    if minimum > maximum:
+        tmp = minimum
+        minimum = maximum
+        maximum = tmp
 
     # gccと同じ組み合わせで生成
     global rnd_next
