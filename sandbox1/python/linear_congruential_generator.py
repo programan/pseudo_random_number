@@ -199,10 +199,10 @@ def test_linear_rnd8():
 
     # 0.0から1.0未満で乱数を生成
     # round()などで丸めこみはしない
-    return float((1.0 / (RAND_MAX + 1.0)) * test_linear_rnd_generator())
-    # return (1.0 / (RAND_MAX + 1.0)) * test_linear_rnd_generator()
+    # return float((1.0 / (RAND_MAX + 1.0)) * test_linear_rnd_generator())
+    return (1.0 / (RAND_MAX + 1.0)) * test_linear_rnd_generator()
     # getcontext().prec = 16
-    # return Decimal((1.0 / (RAND_MAX + 1.0)) * test_linear_rnd_generator())
+    # return Decimal(1.0) / Decimal(RAND_MAX + 1.0) * Decimal(test_linear_rnd_generator())
 
 
 if __name__ == '__main__':
@@ -276,6 +276,8 @@ if __name__ == '__main__':
     for i in range(40):
         ret = test_linear_rnd8()
         # print("%0b" % (ret))
-        value = "%f" % (ret)
+        # value = "%f" % (ret)
+        value = "%.16f" % (ret)
         print(str(value))
+        # print(str(ret))
         # print("%s" % (bin(ret)))
