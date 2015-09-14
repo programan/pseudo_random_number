@@ -252,7 +252,7 @@ if __FILE__ == $0
   $rnd_next = 1
   for i in 0...40
     ret = test_linear_rnd8()
-    puts(ret)
+    puts("%.16f" % ret)
   end
 
 end
