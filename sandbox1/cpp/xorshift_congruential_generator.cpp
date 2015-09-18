@@ -27,7 +27,8 @@ uint32_t xor128_2(uint32_t minimum, uint32_t maximum) {
 	t = x ^ (x << 11);
 	x = y; y = z; z = w;
 	w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
-	return (minimum + w) % maximum;
+	// return (minimum + w) % maximum;
+	return (w % ((maximum + 1) - minimum)) + minimum;
 }
 
 double xor128_3() {
@@ -56,8 +57,13 @@ int main()
 	}
 
 	printf("-----\r\n");
-	for(i=0;i<10;i++){
-		printf("%010u\r\n",xor128_2(10, 1024));
+	for(i=0;i<500;i++){
+		printf("%u\r\n",xor128_2(10, 4294967295));
+	}
+
+	printf("-----\r\n");
+	for(i=0;i<500;i++){
+		printf("%u\r\n",xor128_2(10, 1024));
 	}
 
 	printf("-----\r\n");
