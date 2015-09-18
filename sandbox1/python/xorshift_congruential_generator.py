@@ -123,8 +123,12 @@ def test_xorshift_rnd5(minimum, maximum):
         minimum = maximum
         maximum = tmp
 
-    # minimumからmaximum未満で乱数を生成
-    return int((test_xor_rnd_generator() % ((maximum + 1) - minimum)) + minimum)
+    # minimumからmaximumで乱数を生成
+    # return int((test_xor_rnd_generator() % ((maximum + 1) - minimum)) + minimum)
+
+    # minimumからmaximum未満で生成
+    return int((test_xor_rnd_generator() / float(RAND_MAX + 1.0) * maximum) + int(minimum))
+
 
 
 def test_xorshift_rnd6():
