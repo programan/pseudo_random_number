@@ -61,15 +61,15 @@ int main()
 		printf("%u\r\n",xor128_2(10, 4294967295));
 	}
 
-	printf("-----\r\n");
-	for(i=0;i<500;i++){
-		printf("%u\r\n",xor128_2(10, 1024));
-	}
+	// printf("-----\r\n");
+	// for(i=0;i<500;i++){
+	// 	printf("%u\r\n",xor128_2(10, 1024));
+	// }
 
-	printf("-----\r\n");
-	for(i=0;i<10;i++){
-		printf("%010u\r\n",xor128_2(4294967290, 4294967295));
-	}
+	// printf("-----\r\n");
+	// for(i=0;i<10;i++){
+	// 	printf("%010u\r\n",xor128_2(4294967290, 4294967295));
+	// }
 
 	printf("-----\r\n");
 	uint32_t value = 2;
