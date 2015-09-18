@@ -137,7 +137,9 @@ def test_xorshift_rnd5(minimum, maximum)
 
   # minimumからmaximum未満で生成
   # minimum + 乱数値がRAND_MAXを超えないようにして、maximum内に収める
-  return ((minimum + test_xor_rnd_generator()) & (RAND_MAX - 1)) % maximum
+  # return ((minimum + test_xor_rnd_generator()) & (RAND_MAX - 1)) % maximum
+  return (test_xor_rnd_generator() % ((maximum + 1) - minimum)) + minimum
+
 end
 
 
@@ -188,8 +190,8 @@ if __FILE__ == $0
 
   puts('test---------')
   $x, $y, $z, $w = 123456789, 362436069, 521288629, 88675123
-  for i in 0 ... 1000
-    ret = test_xorshift_rnd5(10, 1024)
+  for i in 0 ... 20
+    ret = test_xorshift_rnd5(10, 4294967295)
     puts(ret)
   end
 
