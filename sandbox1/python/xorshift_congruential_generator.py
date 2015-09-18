@@ -142,6 +142,10 @@ def test_xorshift_rnd5(minimum, maximum):
 
     # minimumからmaximum未満で生成
     # minimum + 乱数値がRAND_MAXを超えないようにして、maximum内に収める
+    # return ((minimum + test_xor_rnd_generator()) & (RAND_MAX - 1)) % maximum
+
+    # minimumからmaximum未満で生成
+    # minimum + 乱数値がRAND_MAXを超えないようにして、maximum内に収める
     return ((minimum + test_xor_rnd_generator()) & (RAND_MAX - 1)) % maximum
 
 
@@ -197,6 +201,15 @@ if __name__ == '__main__':
     x, y, z, w = (123456789, 362436069, 521288629, 88675123)
     for i in range(20):
         ret = test_xorshift_rnd5(1, 5)
+        # print("%0b" % (ret))
+        value = "%d" % (ret)
+        print(str(value))
+        # print("%s" % (bin(ret)))
+
+    print('test---------')
+    x, y, z, w = (123456789, 362436069, 521288629, 88675123)
+    for i in range(500):
+        ret = test_xorshift_rnd5(10, 1024)
         # print("%0b" % (ret))
         value = "%d" % (ret)
         print(str(value))
