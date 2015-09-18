@@ -25,6 +25,13 @@ def seed(s):
     """
     global x, y, z, w
     x, y, z, w = s
+
+    x = int(x)
+    y = int(y)
+    z = int(z)
+    w = int(w)
+
+    # RAND_MAX未満にする
     x &= RAND_MAX - 1
     y &= RAND_MAX - 1
     z &= RAND_MAX - 1
@@ -47,7 +54,7 @@ def test_xorshift_rnd1():
 def test_xorshift_rnd2():
     global x, y, z, w
     # 32bit以内になるようにする
-    # x % 4294967296
+    # x % 4294967296 = x & RAND_MAX - 1
     t = (x ^ (x << 11)) & (RAND_MAX - 1)
     x, y, z = y, z, w
     w = (w ^ (w >> 19)) ^ (t ^ (t >> 8))
@@ -90,6 +97,7 @@ def test_xorshift_rnd4(minimum, maximum):
     x, y, z = y, z, w
     w = (w ^ (w >> 19)) ^ (t ^ (t >> 8))
     # 最小値から最大値未満にする
+    # しかし、minimum + wが2 ** 32以上の場合は考慮されていない
     return (minimum + w) % maximum
 
 
@@ -115,8 +123,8 @@ def test_xorshift_rnd5(minimum, maximum):
     if minimum < 0 or minimum > RAND_MAX:
         minimum = 0
 
-    if maximum <= 0 or maximum >= RAND_MAX:
-        maximum = (RAND_MAX - 1)
+    if maximum <= 0 or maximum > RAND_MAX:
+        maximum = RAND_MAX
 
     if minimum > maximum:
         tmp = minimum
@@ -126,9 +134,15 @@ def test_xorshift_rnd5(minimum, maximum):
     # minimumからmaximumで乱数を生成
     # return int((test_xor_rnd_generator() % ((maximum + 1) - minimum)) + minimum)
 
-    # minimumからmaximum未満で生成
-    return int((test_xor_rnd_generator() / float(RAND_MAX + 1.0) * maximum) + int(minimum))
+    # minimumからmaximumで生成
+    # return int((test_xor_rnd_generator() / float(RAND_MAX + 1.0) * maximum) + int(minimum))
 
+    # minimumからmaximum未満で生成
+    # return (minimum + test_xor_rnd_generator()) % maximum
+
+    # minimumからmaximum未満で生成
+    # minimum + 乱数値がRAND_MAXを超えないようにして、maximum内に収める
+    return ((minimum + test_xor_rnd_generator()) & (RAND_MAX - 1)) % maximum
 
 
 def test_xorshift_rnd6():
@@ -137,7 +151,7 @@ def test_xorshift_rnd6():
     # 0.0から1.0未満で乱数を生成
     # round()などで丸めこみはしない
     # return float((1.0 / (RAND_MAX + 1.0)) * test_linear_rnd_generator())
-    return (1.0 / (RAND_MAX + 1.0)) * test_xor_rnd_generator()
+    return (1.0 / RAND_MAX) * test_xor_rnd_generator()
 
 
 if __name__ == '__main__':
@@ -190,7 +204,16 @@ if __name__ == '__main__':
 
     print('test---------')
     x, y, z, w = (123456789, 362436069, 521288629, 88675123)
-    for i in range(20):
+    for i in range(10):
+        ret = test_xorshift_rnd5(4294967290, 4294967295)
+        # print("%0b" % (ret))
+        value = "%d" % (ret)
+        print(str(value))
+        # print("%s" % (bin(ret)))
+
+    print('test---------')
+    x, y, z, w = (123456789, 362436069, 521288629, 88675123)
+    for i in range(200):
         ret = test_xorshift_rnd6()
         # print("%0b" % (ret))
         # value = "%f" % (ret)
