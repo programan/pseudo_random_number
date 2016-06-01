@@ -17,6 +17,8 @@
 local bit32 = require('./lib/bit32')
 
 
+-- 10進数の値を32桁の2進数に変換して返す
+-- 32bitまでの範囲の値を扱える
 function dec2Bin(decimal)
   -- local binary = 0
   -- local base = 1
@@ -29,6 +31,10 @@ function dec2Bin(decimal)
 
   local binary = {}
   local d = math.abs(decimal)
+
+  if d == 0 then
+    return d
+  end
 
   while d > 0 do
     binary[#binary + 1] = d % 2
@@ -43,24 +49,30 @@ function dec2Bin(decimal)
       result = result .. binary[count]
       count = count -1
     until count == 0
+
+    -- 32桁にする
+    result = string.format("%032d", result)
   end
 
-  -- if decimal < 0 and result ~= 0 then
-    
+  -- 負数の場合
+  -- if decimal < 0 then
+  --   -- 反転して1を足す
+  --   result = bit32.bxor(tonumber(result, 2), 0xffffffff)
+  --   result = result + 1
   -- end
 
   return result
 end
 
 -- print(tonumber(4, 2) .. '<< 2 : ' .. tonumber(bit32.lshift(4,2), 2)) -->16
--- print(dec2Bin(11))
+print(dec2Bin(11))
 
 
-b = 7
-print(dec2Bin(b))
-a = bit32.bxor(b, 0xf)
-print(dec2Bin(a))
-a = a + 1
+-- b = 7
+-- print(dec2Bin(b))
+-- a = bit32.bxor(b, 0xf)
+-- print(dec2Bin(a))
+-- a = a + 1
 
-print(dec2Bin(a))
+-- print(dec2Bin(a))
 
