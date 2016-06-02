@@ -27,7 +27,8 @@ function dec2Bin(decimal)
   local d = math.abs(math.floor(decimal))
 
   if d == 0 then
-    return d
+    return string.format("%032d", d)
+
   end
 
   while d > 0 do
@@ -65,6 +66,24 @@ function dec2Bin(decimal)
 end
 
 -- print(tonumber(4, 2) .. '<< 2 : ' .. tonumber(bit32.lshift(4,2), 2)) -->16
+print(dec2Bin(0))
+print(dec2Bin(1))
+print(dec2Bin(2))
+print(dec2Bin(3))
+print(dec2Bin(4))
+print(dec2Bin(5))
+print(dec2Bin(6))
+print(dec2Bin(7))
+
+print(dec2Bin(-8))
+print(dec2Bin(-7))
+print(dec2Bin(-6))
+print(dec2Bin(-5))
+print(dec2Bin(-4))
+print(dec2Bin(-3))
+print(dec2Bin(-2))
+print(dec2Bin(-1))
+
 print(dec2Bin(11))
 print(dec2Bin(-11))
 
