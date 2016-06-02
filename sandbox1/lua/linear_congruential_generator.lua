@@ -19,18 +19,12 @@ local bit32 = require('./lib/bit32')
 
 -- 10進数の値を32桁の2進数に変換して返す
 -- 32bitまでの範囲の値を扱える
+-- https://note.cman.jp/convert/bit/
 function dec2Bin(decimal)
-  -- local binary = 0
-  -- local base = 1
-  -- while decimal > 0 do
-  --   binary = binary + (decimal % 2) * base
-  --   decimal = math.floor(decimal / 2)
-  --   base = base * 10
-  -- end
-  -- return binary
 
   local binary = {}
-  local d = math.abs(decimal)
+  -- 少数切り捨てて絶対値を取得
+  local d = math.abs(math.floor(decimal))
 
   if d == 0 then
     return d
@@ -42,30 +36,37 @@ function dec2Bin(decimal)
   end
 
   local result = 0
-  if table.getn(binary) > 0 then
-    local count = #binary
+  local count = #binary
 
-    repeat
-      result = result .. binary[count]
-      count = count -1
-    until count == 0
+  repeat
+    result = result .. binary[count]
+    count = count -1
+  until count == 0
 
-    -- 32桁にする
-    result = string.format("%032d", result)
+  -- print(type(result))
+  -- print(result:len())
+  if result:len() > 32 then
+    result = result:sub((result:len() - 32) + 1)
   end
 
-  -- 負数の場合
-  -- if decimal < 0 then
-  --   -- 反転して1を足す
-  --   result = bit32.bxor(tonumber(result, 2), 0xffffffff)
-  --   result = result + 1
-  -- end
+  if decimal < 0 then
+    -- 反転して1を足す
+    result = bit32.bxor(tonumber(result, 2), 0xffffffff)
+    result = result + 1
+    -- 32桁にする
+    -- result = string.format("%132s", result)
+    result = dec2Bin(result)
+  else
+    -- 32桁にする
+    result = string.format("%032s", result)
+  end
 
   return result
 end
 
 -- print(tonumber(4, 2) .. '<< 2 : ' .. tonumber(bit32.lshift(4,2), 2)) -->16
 print(dec2Bin(11))
+print(dec2Bin(-11))
 
 
 -- b = 7
