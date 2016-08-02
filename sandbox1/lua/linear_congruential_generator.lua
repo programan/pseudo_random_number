@@ -96,3 +96,22 @@ print(dec2Bin(-11))
 
 -- print(dec2Bin(a))
 
+
+local rnd_next = 1
+
+function test_linear_rnd1(maximum)
+    -- 乱数生成
+
+    -- gccと同じ組み合わせで生成
+    rnd_next = rnd_next * 1103515245 + 12345
+    -- VCとかと同じように32bitに収まるようにする
+    -- value % 2^32 == value & 2^32-1
+    rnd_next = bit32.band(rnd_next, 0xffffffff)
+
+    -- 出てきた値をそのまま使うと、下1桁が奇数と偶数の繰り返しになる
+    --return int(rnd_next)
+    return math.abs(math.floor(rnd_nextl))
+end
+
+
+print(test_linear_rnd1(10))
