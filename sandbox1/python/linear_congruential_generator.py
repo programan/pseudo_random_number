@@ -207,7 +207,7 @@ def test_linear_rnd8():
 
 if __name__ == '__main__':
 
-    # global rnd_next
+    global rnd_next
     print('test---------')
     rnd_next = 1
     for i in range(20):
