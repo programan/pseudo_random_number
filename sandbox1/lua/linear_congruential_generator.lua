@@ -100,18 +100,26 @@ print(dec2Bin(-11))
 local rnd_next = 1
 
 function test_linear_rnd1(maximum)
-    -- 乱数生成
+  -- 乱数生成
 
-    -- gccと同じ組み合わせで生成
-    rnd_next = rnd_next * 1103515245 + 12345
-    -- VCとかと同じように32bitに収まるようにする
-    -- value % 2^32 == value & 2^32-1
-    rnd_next = bit32.band(rnd_next, 0xffffffff)
+  -- gccと同じ組み合わせで生成
+  rnd_next = rnd_next * 1103515245 + 12345
+  -- VCとかと同じように32bitに収まるようにする
+  -- value % 2^32 == value & 2^32-1
+  -- rnd_next = bit32.band(rnd_next, 0xffffffff)
+  rnd_next = rnd_next % (2^32)
 
-    -- 出てきた値をそのまま使うと、下1桁が奇数と偶数の繰り返しになる
-    --return int(rnd_next)
-    return math.abs(math.floor(rnd_nextl))
+  -- 出てきた値をそのまま使うと、下1桁が奇数と偶数の繰り返しになる
+  -- return int(rnd_next)
+  -- return math.abs(math.floor(rnd_nextl))
+  return math.abs(rnd_next)
 end
 
 
-print(test_linear_rnd1(10))
+for i=1,100 do
+  print(i.." : "..test_linear_rnd1(10))
+end
+
+
+print(bit32.tobit(-1))
+
