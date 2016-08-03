@@ -48,11 +48,18 @@ void intCheck(){
 	std::cout << "sizeof(int)=" << sizeof(int) << "byte" << std::endl;
 
 	unsigned int a = 1103527590;
+	// int a = 1103527590;
 	std::cout << a << std::endl;
-	
-	unsigned int b = a * 1103515245 + 12345;
-	std::cout << b << std::endl;
 
-	unsigned int c = b % 4294967296;
-	std::cout << c << std::endl;
+	for(int i=0; i<9; ++i){
+		unsigned int b = a * 1103515245 + 12345;
+		// int b = a * 1103515245 + 12345;
+		std::cout << b << std::endl;
+		a = b;
+	}
+
+	//unsigned int型でやってるので32ビットを超えたから勝手に捨てられる
+	//pythonやrubyのように自分で2の32乗の剰余を取って32ビットに収めなくてよい
+	// unsigned int c = b % 4294967296;
+	// std::cout << c << std::endl;
 }
