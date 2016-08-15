@@ -71,7 +71,12 @@ def test_linear_rnd4(maximum)
   # 0から引数の値未満の乱数を返す
   # 引数が0なら2**32とする
 
-  maximum = 2 ** 32 if maximum <= 0
+  # maximum = 2 ** 32 if maximum <= 0
+  if maximum <= 0 or maximum > RAND_MAX
+    maximum = RAND_MAX
+  end
+
+  maximum += 1
 
   # gccと同じ組み合わせで生成
   # VCとかと同じように32bitに収まるようにする
