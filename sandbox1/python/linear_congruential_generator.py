@@ -231,7 +231,7 @@ def test_linear_rnd9(minimum, maximum):
         maximum = RAND_MAX
 
     # 引数の値+1として、0から引数の値までの範囲で乱数を求める
-    maximum += 1
+    # maximum += 1
 
     if minimum > maximum:
         tmp = minimum
