@@ -10,7 +10,7 @@
 # # 乱数の最大値は 2 ** 32で収まる値
 
 # この数に収まる乱数になる
-RAND_MAX = 2 ** 32
+RAND_MAX = 0xffffffff
 
 # seed
 # まとめて代入
@@ -39,6 +39,21 @@ def seed(s):
 
     if x + y + z + w <= 0:
         raise ValueError("Please do not substitute 0 for seed.")
+
+
+def test_xorshift32_rnd1():
+    global x, y, z, w
+
+    # 32なので周期は2**32-1
+    # yを32bit整数として扱う
+    # シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
+
+    # Cとかみたいに変数にサイズとかある訳ではないので、
+    # これだと32bitをオーバーする場合がある
+    y = y ^ (y << 13)
+    y = y ^ (y >> 17)
+    y = y ^ (y << 5)
+    return y
 
 
 def test_xorshift_rnd1():
@@ -161,6 +176,18 @@ def test_xorshift_rnd6():
 
 if __name__ == '__main__':
 
+    print('//--xorshift32---------')
+
+    print('test---------')
+    x, y, z, w = (123456789, 362436069, 521288629, 88675123)
+    for i in range(20):
+        ret = test_xorshift32_rnd1()
+        # print("%0b" % (ret))
+        value = "%d" % (ret)
+        print(str(value))
+        # print("%s" % (bin(ret)))
+
+"""
     print('test---------')
     x, y, z, w = (123456789, 362436069, 521288629, 88675123)
     for i in range(20):
@@ -235,3 +262,4 @@ if __name__ == '__main__':
         print(str(value))
         # print(str(ret))
         # print("%s" % (bin(ret)))
+"""
