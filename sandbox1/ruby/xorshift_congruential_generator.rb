@@ -8,16 +8,19 @@
 # # seedのx,y,z,wは0でない整数ならば何でも良い
 # # 周期は2 ** 128 - 1となる
 # # 乱数の最大値は 2 ** 32で収まる値
+# xorshift32,xorshift64,xorshift96,xorshift128と周期が違うものがある
 
-# この数に収まる乱数になる
-RAND_MAX = 2 ** 32
+# この値に収まる乱数になる
+RAND_MAX = 0xffffffff
 
 # seed
 # まとめて代入
 # 各値は符号なし32bit整数に収まる範囲にする
+# 初期値は論文に書いてあった値にした
+# 全てが0にならないのであればどんな値でも良い
 $x, $y, $z, $w = 123456789, 362436069, 521288629, 88675123
 
-
+=begin
 def seed(s)
   # 乱数のseedを設定
   # seed([123456789, 861932, 5671, 232123])
@@ -39,10 +42,209 @@ def seed(s)
     raise "Please do not substitute 0 for seed."
   end
 end
+=end
 
 
-def test_xorshift_rnd1
+def test_xorshift32_rnd1
+  # 32なので周期は2**32-1
+  # yを32bit整数として扱う
+  # シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
+
   # Cとかみたいに変数にサイズとかある訳ではないので、
+  # これだと32bitをオーバーする場合がある
+  $y = $y ^ ($y << 13)
+  $y = $y ^ ($y >> 17)
+  $y = $y ^ ($y << 5)
+  return $y
+end
+
+
+def test_xorshift32_rnd2
+  # 32なので周期は2**32-1
+  # yを32bit整数として扱う
+  # シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
+
+  # 32bitに収まるようにする
+  $y = ($y ^ ($y << 13)) & 0xffffffff
+  $y = $y ^ ($y >> 17)
+  $y = ($y ^ ($y << 5)) & 0xffffffff
+  return $y
+end
+
+
+def test_xorshift32_rnd3
+  # 32なので周期は2**32-1
+  # yを32bit整数として扱う
+  # シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
+
+  # 32bitに収まるようにする
+  $y = ($y ^ ($y << 13)) & 0xffffffff
+
+  # rubyには符号なしとか無いので、右シフトした場合にシフトした分だけ、
+  # 左に0があるようにした値とマスクする。
+  # でも、この処理いらないかも
+  $y = $y ^ ($y >> 17 & 0x7fff)
+
+  $y = ($y ^ ($y << 5)) & 0xffffffff
+  return $y
+end
+
+
+def test_xorshift32_rnd4(minimum, maximum)
+  # 引数が0ならRAND_MAXまでとする
+
+  if minimum < 0 or minimum > RAND_MAX
+    minimum = 0
+  end
+
+  if maximum <= 0 or maximum > RAND_MAX
+    maximum = RAND_MAX
+  end
+
+  # 引数の値+1として、0から引数の値までの範囲で乱数を求める
+  # maximum += 1
+
+  if minimum > maximum
+    tmp = minimum
+    minimum = maximum
+    maximum = tmp
+  end
+
+  # 32bitに収まるようにする
+  $y = ($y ^ ($y << 13)) & 0xffffffff
+  $y = $y ^ ($y >> 17)
+  $y = ($y ^ ($y << 5)) & 0xffffffff
+
+  #RAND_MAXまでの範囲でmin-maxの間に収まるようにする
+  return minimum + (($y * (maximum - minimum + 1.0) / (1.0 + RAND_MAX))).to_i
+end
+
+
+def test_xorshift64_rnd1()
+  # 64ビットの整数を1つ使うxorshift
+  # 周期は2**64-1
+
+  $y = ($y ^ ($y << 13))
+  $y = $y ^ ($y >> 17)
+  $y = ($y ^ ($y << 5))
+  return $y
+end
+
+
+def test_xorshift64_rnd2()
+  # 64ビットの整数を1つ使うxorshift
+  # 周期は2**64-1
+  # 乱数の最大は2**32で収まる値
+
+  # 64bitに収まるようにする
+  $y = ($y ^ ($y << 13)) & 0xffffffffffffffff
+  $y = $y ^ ($y >> 7)
+  # 最終的に32ビットに収まるようにする
+  $y = ($y ^ ($y << 17)) & 0xffffffff
+  return $y
+end
+
+
+def test_xorshift64_rnd3(minimum, maximum)
+  # 引数が0ならRAND_MAXまでとする
+
+  if minimum < 0 or minimum > RAND_MAX
+    minimum = 0
+  end
+
+  if maximum <= 0 or maximum > RAND_MAX
+    maximum = RAND_MAX
+  end
+
+  # 引数の値+1として、0から引数の値までの範囲で乱数を求める
+  # maximum += 1
+
+  if minimum > maximum
+    tmp = minimum
+    minimum = maximum
+    maximum = tmp
+  end
+
+  # 64bitに収まるようにする
+  $y = ($y ^ ($y << 13)) & 0xffffffffffffffff
+  $y = $y ^ ($y >> 7)
+  # 32bitに収まるようにする
+  $y = ($y ^ ($y << 17)) & 0xffffffff
+
+  #RAND_MAXまでの範囲でmin-maxの間に収まるようにする
+  return minimum + (($y * (maximum - minimum + 1.0) / (1.0 + RAND_MAX))).to_i
+end
+
+
+def test_xorshift96_rnd1()
+  # 32bitの整数を3つ使う
+  # 周期は2**96-1
+
+  t = ($x ^ ($x << 3)) ^ ($y ^ ($y >> 19)) ^ ($z ^ ($z << 6))
+  $x = $y
+  $y = $z
+  $z = t
+  return $z
+end
+
+
+def test_xorshift96_rnd2()
+  # 32bitの整数を3つ使う
+  # 周期は2**96-1
+  # 乱数の最大は2**32で収まる値
+
+  xtmp = ($x ^ ($x << 3)) & 0xffffffff
+  ztmp = ($z ^ ($z << 6)) & 0xffffffff
+  # t = ($x ^ ($x << 3)) ^ ($y ^ ($y >> 19)) ^ ($z ^ ($z << 6))
+  t = xtmp ^ ($y ^ ($y >> 19)) ^ ztmp
+  $x = $y
+  $y = $z
+  $z = t
+  return $z
+end
+
+
+def test_xorshift96_rnd3(minimum, maximum)
+  # 32bitの整数を3つ使う
+  # 周期は2**96-1
+  # 乱数の最大は2**32で収まる値
+
+  # 引数が0ならRAND_MAXまでとする
+
+  if minimum < 0 or minimum > RAND_MAX
+    minimum = 0
+  end
+
+  if maximum <= 0 or maximum > RAND_MAX
+    maximum = RAND_MAX
+  end
+
+  # 引数の値+1として、0から引数の値までの範囲で乱数を求める
+  # maximum += 1
+
+  if minimum > maximum
+    tmp = minimum
+    minimum = maximum
+    maximum = tmp
+  end
+
+  xtmp = ($x ^ ($x << 3)) & 0xffffffff
+  ztmp = ($z ^ ($z << 6)) & 0xffffffff
+  # t = ($x ^ ($x << 3)) ^ ($y ^ ($y >> 19)) ^ ($z ^ ($z << 6))
+  t = xtmp ^ ($y ^ ($y >> 19)) ^ ztmp
+  $x = $y
+  $y = $z
+  $z = t
+
+  #RAND_MAXまでの範囲でmin-maxの間に収まるようにする
+  return minimum + (($z * (maximum - minimum + 1.0) / (1.0 + RAND_MAX))).to_i
+end
+
+
+def test_xorshift128_rnd1()
+  # 32bitの整数を4つ使う
+  # 周期は2**128-1
+
   # これだと32bitをオーバーする場合がある
   t = ($x ^ ($x << 11))
   $x, $y, $z = $y, $z, $w
@@ -51,21 +253,26 @@ def test_xorshift_rnd1
 end
 
 
-def test_xorshift_rnd2
-    # 32bit以内になるようにする
-    # x % 4294967296 = x & RAND_MAX - 1
-    t = ($x ^ ($x << 11)) & (RAND_MAX - 1)
-    $x, $y, $z = $y, $z, $w
-    $w = ($w ^ ($w >> 19)) ^ (t ^ (t >> 8))
-    return $w
+def test_xorshift128_rnd2()
+  # 32bitの整数を4つ使う
+  # 周期は2**128-1
+
+  # これだと32bitをオーバーする場合がある
+  t = ($x ^ ($x << 11)) & 0xffffffff
+  $x, $y, $z = $y, $z, $w
+  $w = ($w ^ ($w >> 19)) ^ (t ^ (t >> 8))
+  return $w
 end
 
 
-def test_xorshift_rnd3
-  # 32bit以内になるようにする
-  # x % 4294967296
-  t = ($x ^ ($x << 11)) & (RAND_MAX - 1)
+def test_xorshift128_rnd3()
+  # 32bitの整数を4つ使う
+  # 周期は2**128-1
+
+  # これだと32bitをオーバーする場合がある
+  t = ($x ^ ($x << 11)) & 0xffffffff
   $x, $y, $z = $y, $z, $w
+
   # rubyには符号なしとか無いので、右シフトした場合にシフトした分だけ、
   # 左に0があるようにした値とマスクする。
   # でも、この処理いらないかも
@@ -74,7 +281,12 @@ def test_xorshift_rnd3
 end
 
 
-def test_xorshift_rnd4(minimum, maximum)
+def test_xorshift128_rnd4(minimum, maximum)
+  # 32bitの整数を4つ使う
+  # 周期は2**128-1
+
+  # 引数が0ならRAND_MAXまでとする
+
   if minimum < 0 or minimum > RAND_MAX
     minimum = 0
   end
@@ -83,35 +295,40 @@ def test_xorshift_rnd4(minimum, maximum)
     maximum = RAND_MAX
   end
 
+  # 引数の値+1として、0から引数の値までの範囲で乱数を求める
+  # maximum += 1
+
   if minimum > maximum
     tmp = minimum
     minimum = maximum
     maximum = tmp
   end
 
-  # 32bit以内になるようにする
-  # x % 4294967296
-  t = ($x ^ ($x << 11)) & (RAND_MAX - 1)
+  # 32bitに収まるようにする
+  t = ($x ^ ($x << 11)) & 0xffffffff
   $x, $y, $z = $y, $z, $w
   $w = ($w ^ ($w >> 19)) ^ (t ^ (t >> 8))
-  # 最小値から最大値未満にする
-  # しかし、minimum + wが2 ** 32以上の場合は考慮されていない
-  return (minimum + $w) % maximum
+
+  #RAND_MAXまでの範囲でmin-maxの間に収まるようにする
+  return minimum + (($w * (maximum - minimum + 1.0) / (1.0 + RAND_MAX))).to_i
 end
 
 
-def test_xor_rnd_generator
+def test_xorshift128_rnd_generator
+  # 32bitの整数を4つ使う
+  # 周期は2**128-1
+
   # 32bit以内になるようにする
-  # x % 4294967296
-  t = ($x ^ ($x << 11)) & (RAND_MAX - 1)
+  t = ($x ^ ($x << 11)) & 0xffffffff
   $x, $y, $z = $y, $z, $w
   $w = ($w ^ ($w >> 19)) ^ (t ^ (t >> 8))
-
   return $w
 end
 
 
-def test_xorshift_rnd5(minimum, maximum)
+def test_xorshift128_rnd5(minimum, maximum)
+  # 引数が0ならRAND_MAXまでとする
+
   if minimum < 0 or minimum > RAND_MAX
     minimum = 0
   end
@@ -120,93 +337,147 @@ def test_xorshift_rnd5(minimum, maximum)
     maximum = RAND_MAX
   end
 
+  # 引数の値+1として、0から引数の値までの範囲で乱数を求める
+  # maximum += 1
+
   if minimum > maximum
     tmp = minimum
     minimum = maximum
     maximum = tmp
   end
 
-  # minimumからmaximumで乱数を生成
-  # return int((test_xor_rnd_generator() % ((maximum + 1) - minimum)) + minimum)
-
-  # minimumからmaximumで生成
-  # return int((test_xor_rnd_generator() / float(RAND_MAX + 1.0) * maximum) + int(minimum))
-
-  # minimumからmaximum未満で生成
-  # return (minimum + test_xor_rnd_generator()) % maximum
-
-  # minimumからmaximum未満で生成
-  # minimum + 乱数値がRAND_MAXを超えないようにして、maximum内に収める
-  # return ((minimum + test_xor_rnd_generator()) & (RAND_MAX - 1)) % maximum
-  return (test_xor_rnd_generator() % ((maximum + 1) - minimum)) + minimum
-
+  return minimum + ((test_xorshift128_rnd_generator() * (maximum - minimum + 1.0) / (1.0 + RAND_MAX))).to_i
 end
 
 
-def test_xorshift_rnd6
+def test_xorshift128_rnd6
   # 0.0から1.0未満で乱数を生成
   # round()などで丸めこみはしない
   # return float((1.0 / (RAND_MAX + 1.0)) * test_linear_rnd_generator())
-  return (1.0 / RAND_MAX) * test_xor_rnd_generator()
+  return ((1.0 / RAND_MAX) * test_xorshift128_rnd_generator()).to_f
 end
 
 
 if __FILE__ == $0
 
-  puts('test---------')
+  puts('//---xorshift32--------')
+
+  puts('test1---------')
   $x, $y, $z, $w = 123456789, 362436069, 521288629, 88675123
   for i in 0 ... 20
-    ret = test_xorshift_rnd1()
+    ret = test_xorshift32_rnd1()
     puts(ret)
   end
 
-  puts('test---------')
+  puts('test2---------')
   $x, $y, $z, $w = 123456789, 362436069, 521288629, 88675123
   for i in 0 ... 20
-    ret = test_xorshift_rnd2()
+    ret = test_xorshift32_rnd2()
     puts(ret)
   end
 
-  puts('test---------')
+  puts('test3---------')
   $x, $y, $z, $w = 123456789, 362436069, 521288629, 88675123
   for i in 0 ... 20
-    ret = test_xorshift_rnd3()
+    ret = test_xorshift32_rnd3()
     puts(ret)
   end
 
-  puts('test---------')
+  puts('test4---------')
   $x, $y, $z, $w = 123456789, 362436069, 521288629, 88675123
   for i in 0 ... 20
-    ret = test_xorshift_rnd4(1, 5)
+    ret = test_xorshift32_rnd4(20, 128)
     puts(ret)
   end
 
-  puts('test---------')
+  puts('//---xorshift64--------')
+
+  puts('test1---------')
   $x, $y, $z, $w = 123456789, 362436069, 521288629, 88675123
   for i in 0 ... 20
-    ret = test_xorshift_rnd5(1, 5)
+    ret = test_xorshift64_rnd1()
     puts(ret)
   end
 
-  puts('test---------')
+  puts('test2---------')
   $x, $y, $z, $w = 123456789, 362436069, 521288629, 88675123
   for i in 0 ... 20
-    ret = test_xorshift_rnd5(10, 4294967295)
+    ret = test_xorshift64_rnd2()
     puts(ret)
   end
 
-  puts('test---------')
+  puts('test3---------')
   $x, $y, $z, $w = 123456789, 362436069, 521288629, 88675123
-  for i in 0 ... 10
-    ret = test_xorshift_rnd5(4294967290, 4294967295)
+  for i in 0 ... 20
+    ret = test_xorshift64_rnd3(20, 128)
     puts(ret)
   end
 
-  puts('test---------')
+  puts('//---xorshift96--------')
+
+  puts('test1---------')
   $x, $y, $z, $w = 123456789, 362436069, 521288629, 88675123
-  for i in 0 ... 200
-    ret = test_xorshift_rnd6()
-    puts("%.16f" % ret)
+  for i in 0 ... 20
+    ret = test_xorshift96_rnd1()
+    puts(ret)
+  end
+
+  puts('test2---------')
+  $x, $y, $z, $w = 123456789, 362436069, 521288629, 88675123
+  for i in 0 ... 20
+    ret = test_xorshift96_rnd2()
+    puts(ret)
+  end
+
+  puts('test3---------')
+  $x, $y, $z, $w = 123456789, 362436069, 521288629, 88675123
+  for i in 0 ... 20
+    ret = test_xorshift96_rnd3(20, 128)
+    puts(ret)
+  end
+
+  puts('//---xorshift128--------')
+
+  puts('test1---------')
+  $x, $y, $z, $w = 123456789, 362436069, 521288629, 88675123
+  for i in 0 ... 20
+    ret = test_xorshift128_rnd1()
+    puts(ret)
+  end
+
+  puts('test2---------')
+  $x, $y, $z, $w = 123456789, 362436069, 521288629, 88675123
+  for i in 0 ... 20
+    ret = test_xorshift128_rnd2()
+    puts(ret)
+  end
+
+  puts('test3---------')
+  $x, $y, $z, $w = 123456789, 362436069, 521288629, 88675123
+  for i in 0 ... 20
+    ret = test_xorshift128_rnd3()
+    puts(ret)
+  end
+
+  puts('test4---------')
+  $x, $y, $z, $w = 123456789, 362436069, 521288629, 88675123
+  for i in 0 ... 20
+    ret = test_xorshift128_rnd4(20, 128)
+    puts(ret)
+  end
+
+  puts('test5---------')
+  $x, $y, $z, $w = 123456789, 362436069, 521288629, 88675123
+  for i in 0 ... 20
+    ret = test_xorshift128_rnd5(20, 128)
+    puts(ret)
+  end
+
+  puts('test6---------')
+  $x, $y, $z, $w = 123456789, 362436069, 521288629, 88675123
+  for i in 0 ... 40
+    ret = test_xorshift128_rnd6()
+    puts(ret)
   end
 end
 
