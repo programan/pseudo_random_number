@@ -1,10 +1,14 @@
 #include <iostream>
 
+uint32_t variableTypeTest();
 void doubleCheck();
 void intCheck();
 
+
 int main(int argc, char *argv[]){
 	std::cout << "Hello c++" << std::endl;
+
+	std::cout << "" << variableTypeTest() << std::endl;
 
 	std::cout << "//++++++++++++++++++++++++++++++++//" << std::endl;
 	doubleCheck();
@@ -13,6 +17,21 @@ int main(int argc, char *argv[]){
 	return 0;
 }
 
+
+uint32_t variableTypeTest(){
+	std::cout << "sizeof(uint64_t)=" << sizeof(uint64_t) << "byte" << std::endl;
+	std::cout << "sizeof(uint32_t)=" << sizeof(uint32_t) << "byte" << std::endl;
+
+	static uint64_t x = 88172645463325252ULL;
+	std::cout << "x1 " << x << std::endl;
+	x = x ^ (x << 13);
+	std::cout << "x2 " << x << std::endl;
+	x = x ^ (x >> 7);
+	std::cout << "x3 " << x << std::endl;
+	x = x ^ (x << 17);
+	std::cout << "x4 " << x << std::endl;
+	return x;
+}
 
 void doubleCheck(){
 	std::cout << "sizeof(double)=" << sizeof(double) << "byte" << std::endl;
