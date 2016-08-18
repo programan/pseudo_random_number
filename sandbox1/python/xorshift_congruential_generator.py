@@ -463,7 +463,7 @@ def test_xorshift128_rnd6():
     # 0.0から1.0未満で乱数を生成
     # round()などで丸めこみはしない
     # return float((1.0 / (RAND_MAX + 1.0)) * test_linear_rnd_generator())
-    return (1.0 / RAND_MAX) * test_xorshift128_rnd_generator()
+    return (1.0 / (RAND_MAX + 1.0)) * test_xorshift128_rnd_generator()
 
 
 if __name__ == '__main__':
@@ -618,7 +618,7 @@ if __name__ == '__main__':
         ret = test_xorshift128_rnd6()
         # print("%0b" % (ret))
         # value = "%f" % (ret)
-        value = "%.16f" % (ret)
+        value = "%.15f" % (ret)
         print(str(value))
         # print(str(ret))
         # print("%s" % (bin(ret)))
@@ -629,7 +629,7 @@ if __name__ == '__main__':
     print(str(y))
     print(str(z))
     print(str(w))
-    for i in range(100000):
+    for i in range(100):
         ret = test_xorshift128_rnd5(1, 2048)
         if ret > 2048:
             print("error")
@@ -643,6 +643,7 @@ if __name__ == '__main__':
         # print(str(ret))
         # print("%s" % (bin(ret)))
 
+""""
     print('test8--------')
     seed(1976)
     print(str(x))
@@ -662,3 +663,4 @@ if __name__ == '__main__':
         print(str(no) + " " + str(value))
         # print(str(ret))
         # print("%s" % (bin(ret)))
+"""
