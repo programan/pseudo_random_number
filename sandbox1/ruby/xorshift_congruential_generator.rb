@@ -374,7 +374,7 @@ def test_xorshift128_rnd6
   # 0.0から1.0未満で乱数を生成
   # round()などで丸めこみはしない
   # return float((1.0 / (RAND_MAX + 1.0)) * test_linear_rnd_generator())
-  return ((1.0 / RAND_MAX) * test_xorshift128_rnd_generator()).to_f
+  return ((1.0 / (RAND_MAX + 1.0)) * test_xorshift128_rnd_generator()).to_f
 end
 
 
@@ -497,7 +497,7 @@ if __FILE__ == $0
   $x, $y, $z, $w = 123456789, 362436069, 521288629, 88675123
   for i in 0 ... 40
     ret = test_xorshift128_rnd6()
-    puts("%.16f" % [ret])
+    puts("%.15f" % [ret])
   end
 
   puts('test7---------')
@@ -506,7 +506,7 @@ if __FILE__ == $0
   puts($y)
   puts($z)
   puts($w)
-  for i in 0 ... 100000
+  for i in 0 ... 100
     ret = test_xorshift128_rnd5(1, 2048)
     if ret > 2048
       puts("error")
@@ -515,19 +515,19 @@ if __FILE__ == $0
     puts("%06d %d" % [i, ret])
   end
 
-  puts('test8---------')
-  seed(1976)
-  puts($x)
-  puts($y)
-  puts($z)
-  puts($w)
-  for i in 0 ... 100000
-    ret = test_xorshift128_rnd5(1, 6)
-    if ret > 6
-      puts("error")
-      break
-    end
-    puts("%06d %d" % [i, ret])
-  end
+  # puts('test8---------')
+  # seed(1976)
+  # puts($x)
+  # puts($y)
+  # puts($z)
+  # puts($w)
+  # for i in 0 ... 100000
+  #   ret = test_xorshift128_rnd5(1, 6)
+  #   if ret > 6
+  #     puts("error")
+  #     break
+  #   end
+  #   puts("%06d %d" % [i, ret])
+  # end
 end
 
