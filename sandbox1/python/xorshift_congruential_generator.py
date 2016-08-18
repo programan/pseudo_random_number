@@ -41,12 +41,15 @@ def seed(s):
         raise ValueError("Please do not substitute 0 for seed.")
 
 
+# xorshift32
 def test_xorshift32_rnd1():
+    """
+    乱数生成
+    32なので周期は2**32-1
+    yを32bit整数として扱う
+    シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
+    """
     global x, y, z, w
-
-    # 32なので周期は2**32-1
-    # yを32bit整数として扱う
-    # シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
 
     # Cとかみたいに変数にサイズとかある訳ではないので、
     # これだと32bitをオーバーする場合がある
@@ -56,12 +59,16 @@ def test_xorshift32_rnd1():
     return y
 
 
+# xorshift32
 def test_xorshift32_rnd2():
+    """
+    乱数生成
+    32なので周期は2**32-1
+    yを32bit整数として扱う
+    シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
+    0から2**32で収まる範囲の乱数を返す
+    """
     global x, y, z, w
-
-    # 32なので周期は2**32-1
-    # yを32bit整数として扱う
-    # シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
 
     # 32bitに収まるようにする
     y = y ^ (y << 13) & 0xffffffff
@@ -70,12 +77,16 @@ def test_xorshift32_rnd2():
     return y
 
 
+# xorshift3
 def test_xorshift32_rnd3():
+    """
+    乱数生成
+    32なので周期は2**32-1
+    yを32bit整数として扱う
+    シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
+    0から2**32で収まる範囲の乱数を返す
+    """
     global x, y, z, w
-
-    # 32なので周期は2**32-1
-    # yを32bit整数として扱う
-    # シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
 
     # 32bitに収まるようにする
     y = y ^ (y << 13) & 0xffffffff
@@ -88,10 +99,14 @@ def test_xorshift32_rnd3():
     return y
 
 
+# xorshift32
 def test_xorshift32_rnd4(minimum, maximum):
     """
     乱数生成
-    0から引数の値までの乱数を返す
+    32なので周期は2**32-1
+    yを32bit整数として扱う
+    シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
+    minからmaxまでの範囲の乱数を返す
     引数が0ならRAND_MAXまでとする
     """
     global x, y, z, w
@@ -123,22 +138,33 @@ def test_xorshift32_rnd4(minimum, maximum):
     return minimum + int((y * (maximum - minimum + 1.0) / (1.0 + RAND_MAX)))
 
 
+# xorshift64
 def test_xorshift64_rnd1():
-    # 64ビットの整数を1つ使うxorshift
-    # 周期は2**64-1
+    """
+    乱数生成
+    64なので周期は2**64-1
+    yを64bit整数として扱う
+    シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
+    """
     global x, y, z, w
 
+    # Cとかみたいに変数にサイズとかある訳ではないので、
+    # これだと32bitをオーバーする場合がある
     y = (y ^ (y << 13))
     y = y ^ (y >> 7)
     y = (y ^ (y << 17))
     return y
 
 
+# xorshift64
 def test_xorshift64_rnd2():
-    # 64ビットの整数を1つ使うxorshift
-    # 周期は2**64-1
-    # 乱数の最大は2**32で収まる値
-
+    """
+    乱数生成
+    64なので周期は2**64-1
+    yを64bit整数として扱う
+    シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
+    0から2**32で収まる範囲の乱数を返す
+    """
     global x, y, z, w
 
     # 64bitに収まるようにする
@@ -149,15 +175,15 @@ def test_xorshift64_rnd2():
     return y
 
 
+# xorshift64
 def test_xorshift64_rnd3(minimum, maximum):
     """
     乱数生成
-    0から引数の値までの乱数を返す
-    引数が0ならRAND_MAXまでとする
+    64なので周期は2**64-1
+    yを64bit整数として扱う
+    シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
+    minからmaxで収まる範囲の乱数を返す
     """
-
-    # 64ビットの整数を1つ使うxorshift
-    # 周期は2**64-1
     global x, y, z, w
 
     if minimum < 0 or minimum > RAND_MAX:
@@ -183,9 +209,14 @@ def test_xorshift64_rnd3(minimum, maximum):
     return minimum + int((y * (maximum - minimum + 1.0) / (1.0 + RAND_MAX)))
 
 
+# xorhisft96
 def test_xorshift96_rnd1():
-    # 32bitの整数を3つ使う
-    # 周期は2**96-1
+    """
+    乱数生成
+    32bitの整数を3つ使う
+    96なので周期は2**96-1
+    シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
+    """
     global x, y, z, w
 
     t = (x ^ (x << 3)) ^ (y ^ (y >> 19)) ^ (z ^ (z << 6))
@@ -195,10 +226,15 @@ def test_xorshift96_rnd1():
     return z
 
 
+# xorshift96
 def test_xorshift96_rnd2():
-    # 32bitの整数を3つ使う
-    # 周期は2**96-1
-    # 乱数の最大は2**32で収まる値
+    """
+    乱数生成
+    32bitの整数を3つ使う
+    96なので周期は2**96-1
+    シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
+    0から2**32で収まる範囲の乱数を返す
+    """
     global x, y, z, w
 
     xtmp = (x ^ (x << 3)) & 0xffffffff
@@ -211,10 +247,15 @@ def test_xorshift96_rnd2():
     return z
 
 
+# xorshift96
 def test_xorshift96_rnd3(minimum, maximum):
-    # 32bitの整数を3つ使う
-    # 周期は2**96-1
-    # 乱数の最大は2**32で収まる値
+    """
+    乱数生成
+    32bitの整数を3つ使う
+    96なので周期は2**96-1
+    シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
+    minからmaxで収まる範囲の乱数を返す
+    """
     global x, y, z, w
 
     if minimum < 0 or minimum > RAND_MAX:
@@ -242,7 +283,14 @@ def test_xorshift96_rnd3(minimum, maximum):
     return minimum + int((z * (maximum - minimum + 1.0) / (1.0 + RAND_MAX)))
 
 
+# xorshift128
 def test_xorshift128_rnd1():
+    """
+    乱数生成
+    32bitの整数を3つ使う
+    96なので周期は2**96-1
+    シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
+    """
     global x, y, z, w
     # Cとかみたいに変数にサイズとかある訳ではないので、
     # これだと32bitをオーバーする場合がある
@@ -252,7 +300,15 @@ def test_xorshift128_rnd1():
     return w
 
 
+# xorshift128
 def test_xorshift128_rnd2():
+    """
+    乱数生成
+    32bitの整数を3つ使う
+    96なので周期は2**96-1
+    シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
+    0から2**32で収まる範囲の乱数を返す
+    """
     global x, y, z, w
     # 32bit以内になるようにする
     t = (x ^ (x << 11)) & 0xffffffff
@@ -261,7 +317,15 @@ def test_xorshift128_rnd2():
     return w
 
 
+# xorshift128
 def test_xorshift128_rnd3():
+    """
+    乱数生成
+    32bitの整数を3つ使う
+    96なので周期は2**96-1
+    シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
+    0から2**32で収まる範囲の乱数を返す
+    """
     global x, y, z, w
     # 32bit以内になるようにする
     # x % 4294967296
@@ -274,10 +338,16 @@ def test_xorshift128_rnd3():
     return w
 
 
+# xorshift128
 def test_xorshift128_rnd4(minimum, maximum):
     """
-    最小値と最大値を指定
+    乱数生成
+    32bitの整数を3つ使う
+    96なので周期は2**96-1
+    シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
+    minからmaxで収まる範囲の乱数を返す
     """
+
     # 乱数の最大は2**32で収まる値
     global x, y, z, w
 
@@ -305,11 +375,15 @@ def test_xorshift128_rnd4(minimum, maximum):
     return minimum + int((w * (maximum - minimum + 1.0) / (1.0 + RAND_MAX)))
 
 
+# xorshift128
 def test_xorshift128_rnd_generator():
     """
     乱数生成
+    32bitの整数を3つ使う
+    96なので周期は2**96-1
+    シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
+    0から2**32で収まる範囲の乱数を返す
     """
-
     global x, y, z, w
 
     # 32bit以内になるようにする
@@ -320,7 +394,15 @@ def test_xorshift128_rnd_generator():
     return w
 
 
+# xorshift128
 def test_xorshift128_rnd5(minimum, maximum):
+    """
+    乱数生成
+    32bitの整数を3つ使う
+    96なので周期は2**96-1
+    シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
+    minからmaxで収まる範囲の乱数を返す
+    """
     # 乱数の最大は2**32で収まる値
     global x, y, z, w
 
@@ -343,7 +425,15 @@ def test_xorshift128_rnd5(minimum, maximum):
     return minimum + int((test_xorshift128_rnd_generator() * range / rmax))
 
 
+# xorshift128
 def test_xorshift128_rnd6():
+    """
+    乱数生成
+    32bitの整数を3つ使う
+    96なので周期は2**96-1
+    シフトに使っている値は論文に書かれている優良パラメータのうちの一つ
+    0から1.0未満の範囲の乱数を返す
+    """
     global x, y, z, w
 
     # 0.0から1.0未満で乱数を生成
