@@ -44,6 +44,26 @@ def seed(s)
 end
 =end
 
+def seed(s)
+  raise "argument is not integer" if not s.is_a?(Integer)
+  if s < 0
+    s *= -1
+  end
+
+  seedTmp = []
+  for i in 1 ... 5
+    # 32bitで収まるようにする
+    s = (1812433253 * (s ^ (s >> 30)) + i) & 0xffffffff
+    # puts("%02d %d" % [i, s])
+    seedTmp.push(s)
+  end
+
+  $x = seedTmp[0]
+  $y = seedTmp[1]
+  $z = seedTmp[2]
+  $w = seedTmp[3]
+end
+
 
 def test_xorshift32_rnd1
   # 32なので周期は2**32-1
@@ -478,6 +498,36 @@ if __FILE__ == $0
   for i in 0 ... 40
     ret = test_xorshift128_rnd6()
     puts("%.16f" % [ret])
+  end
+
+  puts('test7---------')
+  seed(1978)
+  puts($x)
+  puts($y)
+  puts($z)
+  puts($w)
+  for i in 0 ... 100000
+    ret = test_xorshift128_rnd5(1, 2048)
+    if ret > 2048
+      puts("error")
+      break
+    end
+    puts("%06d %d" % [i, ret])
+  end
+
+  puts('test8---------')
+  seed(1976)
+  puts($x)
+  puts($y)
+  puts($z)
+  puts($w)
+  for i in 0 ... 100000
+    ret = test_xorshift128_rnd5(1, 6)
+    if ret > 6
+      puts("error")
+      break
+    end
+    puts("%06d %d" % [i, ret])
   end
 end
 
