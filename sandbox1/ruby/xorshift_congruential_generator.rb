@@ -125,8 +125,8 @@ def test_xorshift64_rnd1()
   # 周期は2**64-1
 
   $y = ($y ^ ($y << 13))
-  $y = $y ^ ($y >> 17)
-  $y = ($y ^ ($y << 5))
+  $y = $y ^ ($y >> 7)
+  $y = ($y ^ ($y << 17))
   return $y
 end
 
@@ -477,7 +477,7 @@ if __FILE__ == $0
   $x, $y, $z, $w = 123456789, 362436069, 521288629, 88675123
   for i in 0 ... 40
     ret = test_xorshift128_rnd6()
-    puts(ret)
+    puts("%.16f" % [ret])
   end
 end
 
