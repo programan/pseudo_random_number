@@ -18,27 +18,48 @@ RAND_MAX = 0xffffffff
 x, y, z, w = (123456789, 362436069, 521288629, 88675123)
 
 
+# def seed(s):
+#     """
+#     乱数のseedを設定
+#     seed([123456789, 861932, 5671, 232123])
+#     """
+#     global x, y, z, w
+#     x, y, z, w = s
+#
+#     x = int(x)
+#     y = int(y)
+#     z = int(z)
+#     w = int(w)
+#
+#     # RAND_MAX未満にする
+#     x &= RAND_MAX - 1
+#     y &= RAND_MAX - 1
+#     z &= RAND_MAX - 1
+#     w &= RAND_MAX - 1
+#
+#     if x + y + z + w <= 0:
+#         raise ValueError("Please do not substitute 0 for seed.")
+
+# 乱数のseedを設定
 def seed(s):
-    """
-    乱数のseedを設定
-    seed([123456789, 861932, 5671, 232123])
-    """
     global x, y, z, w
-    x, y, z, w = s
 
-    x = int(x)
-    y = int(y)
-    z = int(z)
-    w = int(w)
+    if not isinstance(s, int):
+        raise ValueError("argument is not integer")
 
-    # RAND_MAX未満にする
-    x &= RAND_MAX - 1
-    y &= RAND_MAX - 1
-    z &= RAND_MAX - 1
-    w &= RAND_MAX - 1
+    if s < 0:
+        s = s * -1
 
-    if x + y + z + w <= 0:
-        raise ValueError("Please do not substitute 0 for seed.")
+    seed = []
+    for i in range(1, 5):
+        # 32bitで収まるようにする
+        s = (1812433253 * (s ^ (s >> 30)) + i) & 0xffffffff
+        seed.append(s)
+
+    x = seed[0]
+    y = seed[1]
+    z = seed[2]
+    w = seed[3]
 
 
 # xorshift32
@@ -588,7 +609,7 @@ if __name__ == '__main__':
         print(str(value))
         # print("%s" % (bin(ret)))
 
-    print('test---------')
+    print('test6--------')
     x, y, z, w = (123456789, 362436069, 521288629, 88675123)
     for i in range(40):
         ret = test_xorshift128_rnd6()
@@ -596,5 +617,17 @@ if __name__ == '__main__':
         # value = "%f" % (ret)
         value = "%.16f" % (ret)
         print(str(value))
+        # print(str(ret))
+        # print("%s" % (bin(ret)))
+
+    print('test7--------')
+    seed(1978)
+    for i in range(100):
+        ret = test_xorshift128_rnd5(1, 2048)
+        # print("%0b" % (ret))
+        # value = "%f" % (ret)
+        no = "%04d" % (i)
+        value = "%d" % (ret)
+        print(str(no) + " " + str(value))
         # print(str(ret))
         # print("%s" % (bin(ret)))
