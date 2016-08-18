@@ -54,6 +54,9 @@ def seed(s):
     for i in range(1, 5):
         # 32bitで収まるようにする
         s = (1812433253 * (s ^ (s >> 30)) + i) & 0xffffffff
+        # no = "%02d" % (i)
+        # value = "%d" % (s)
+        # print(str(no) + " " + str(value))
         seed.append(s)
 
     x = seed[0]
@@ -464,7 +467,7 @@ def test_xorshift128_rnd6():
 
 
 if __name__ == '__main__':
-    global x, y, z, w
+    # global x, y, z, w
 
     print('//--xorshift32---------')
 
@@ -622,11 +625,39 @@ if __name__ == '__main__':
 
     print('test7--------')
     seed(1978)
-    for i in range(100):
+    print(str(x))
+    print(str(y))
+    print(str(z))
+    print(str(w))
+    for i in range(100000):
         ret = test_xorshift128_rnd5(1, 2048)
+        if ret > 2048:
+            print("error")
+            break
+
         # print("%0b" % (ret))
         # value = "%f" % (ret)
-        no = "%04d" % (i)
+        no = "%06d" % (i)
+        value = "%d" % (ret)
+        print(str(no) + " " + str(value))
+        # print(str(ret))
+        # print("%s" % (bin(ret)))
+
+    print('test8--------')
+    seed(1976)
+    print(str(x))
+    print(str(y))
+    print(str(z))
+    print(str(w))
+    for i in range(100000):
+        ret = test_xorshift128_rnd5(1, 6)
+        if ret > 6:
+            print("error")
+            break
+
+        # print("%0b" % (ret))
+        # value = "%f" % (ret)
+        no = "%06d" % (i)
         value = "%d" % (ret)
         print(str(no) + " " + str(value))
         # print(str(ret))
